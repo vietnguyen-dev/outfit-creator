@@ -1,19 +1,16 @@
-<!-- template/login.html -->
+<!-- template/signup.html -->
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Outfit Creator</title>
+    <title>Sign Up - Outfit Creator</title>
 
-    <!-- Bootstrap 5 CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-
-    <!-- Bootstrap Icons -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
@@ -26,9 +23,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 2rem 0;
       }
 
-      .login-container {
+      .signup-container {
         max-width: 450px;
         width: 100%;
       }
@@ -65,6 +63,19 @@
         background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
       }
 
+      .password-strength {
+        height: 5px;
+        margin-top: 0.5rem;
+        border-radius: 3px;
+        background-color: #e9ecef;
+      }
+
+      .password-strength-bar {
+        height: 100%;
+        border-radius: 3px;
+        transition: all 0.3s;
+      }
+
       .social-btn {
         border: 1px solid #dee2e6;
         padding: 0.75rem;
@@ -99,31 +110,42 @@
     </style>
   </head>
   <body>
-    <div class="login-container">
+    <div class="signup-container">
       <div class="card">
         <div class="card-header text-center">
-          <h3 class="mb-3">Welcome Back</h3>
-          <p class="text-muted">Sign in to your account</p>
+          <h3 class="mb-3">Create Account</h3>
+          <p class="text-muted">Join us today</p>
         </div>
 
         <div class="card-body">
-          <!-- Social Login Buttons -->
+          <!-- Social Signup Buttons -->
           <button class="btn btn-outline-dark w-100 social-btn">
             <i class="bi bi-google me-2"></i>
-            Continue with Google
+            Sign up with Google
           </button>
 
           <button class="btn btn-outline-dark w-100 social-btn">
             <i class="bi bi-facebook me-2"></i>
-            Continue with Facebook
+            Sign up with Facebook
           </button>
 
           <div class="divider">
             <span>OR</span>
           </div>
 
-          <!-- Login Form -->
-          <form id="loginForm">
+          <!-- Signup Form -->
+          <form id="signupForm">
+            <div class="mb-3">
+              <label for="name" class="form-label">Full Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                placeholder="John Doe"
+                required
+              />
+            </div>
+
             <div class="mb-3">
               <label for="email" class="form-label">Email address</label>
               <input
@@ -142,7 +164,7 @@
                   type="password"
                   class="form-control"
                   id="password"
-                  placeholder="Enter your password"
+                  placeholder="Create a strong password"
                   required
                 />
                 <button
@@ -153,28 +175,49 @@
                   <i class="bi bi-eye"></i>
                 </button>
               </div>
+              <div class="password-strength">
+                <div class="password-strength-bar" id="strengthBar"></div>
+              </div>
+              <small class="text-muted" id="strengthText"></small>
             </div>
 
-            <div class="mb-3 form-check">
-              <input type="checkbox" class="form-check-input" id="rememberMe" />
-              <label class="form-check-label" for="rememberMe">
-                Remember me
-              </label>
-              <a href="#" class="float-end text-decoration-none"
-                >Forgot password?</a
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label"
+                >Confirm Password</label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="confirmPassword"
+                placeholder="Re-enter your password"
+                required
+              />
+              <small class="text-danger d-none" id="passwordMismatch"
+                >Passwords do not match</small
               >
             </div>
 
+            <div class="mb-3 form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="terms"
+                required
+              />
+              <label class="form-check-label" for="terms">
+                I agree to the
+                <a href="#" class="text-decoration-none">Terms & Conditions</a>
+              </label>
+            </div>
+
             <button type="submit" class="btn btn-primary w-100 mb-3">
-              Sign In
+              Create Account
             </button>
           </form>
 
           <p class="text-center text-muted mb-0">
-            Don't have an account?
-            <a href="/signup.html" class="text-decoration-none fw-bold"
-              >Sign up</a
-            >
+            Already have an account?
+            <a href="/" class="text-decoration-none fw-bold">Sign in</a>
           </p>
         </div>
       </div>
@@ -184,7 +227,6 @@
       </p>
     </div>
 
-    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -201,39 +243,81 @@
         icon.classList.toggle("bi-eye-slash");
       });
 
+      // Password strength checker
+      passwordInput.addEventListener("input", function () {
+        const password = this.value;
+        const strengthBar = document.getElementById("strengthBar");
+        const strengthText = document.getElementById("strengthText");
+
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+        if (password.match(/\d/)) strength++;
+        if (password.match(/[^a-zA-Z\d]/)) strength++;
+
+        const colors = ["#dc3545", "#ffc107", "#17a2b8", "#28a745"];
+        const texts = ["Weak", "Fair", "Good", "Strong"];
+        const widths = ["25%", "50%", "75%", "100%"];
+
+        if (password.length === 0) {
+          strengthBar.style.width = "0%";
+          strengthText.textContent = "";
+        } else {
+          strengthBar.style.width = widths[strength];
+          strengthBar.style.backgroundColor = colors[strength];
+          strengthText.textContent = texts[strength];
+          strengthText.style.color = colors[strength];
+        }
+      });
+
+      // Check password confirmation
+      const confirmPassword = document.getElementById("confirmPassword");
+      const passwordMismatch = document.getElementById("passwordMismatch");
+
+      confirmPassword.addEventListener("input", function () {
+        if (this.value !== passwordInput.value) {
+          passwordMismatch.classList.remove("d-none");
+        } else {
+          passwordMismatch.classList.add("d-none");
+        }
+      });
+
       // Handle form submission
       document
-        .getElementById("loginForm")
+        .getElementById("signupForm")
         .addEventListener("submit", async function (e) {
           e.preventDefault();
 
+          if (passwordInput.value !== confirmPassword.value) {
+            alert("Passwords do not match!");
+            return;
+          }
+
+          const name = document.getElementById("name").value;
           const email = document.getElementById("email").value;
-          const password = document.getElementById("password").value;
+          const password = passwordInput.value;
 
-          console.log("Login attempt:", { email, password });
+          console.log("Signup attempt:", { name, email, password });
 
-          // TODO: Add your login logic here
-          // Example API call:
+          // TODO: Add your signup logic here
           /*
       try {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ name, email, password })
         });
         
         const data = await response.json();
         
         if (response.ok) {
-          // Store token
-          localStorage.setItem('token', data.token);
-          // Redirect to dashboard
-          window.location.href = '/dashboard';
+          alert('Account created successfully!');
+          window.location.href = '/login';
         } else {
-          alert(data.error || 'Login failed');
+          alert(data.error || 'Signup failed');
         }
       } catch (error) {
-        console.error('Login error:', error);
+        console.error('Signup error:', error);
         alert('An error occurred. Please try again.');
       }
       */
